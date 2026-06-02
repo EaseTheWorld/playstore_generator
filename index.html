@@ -320,7 +320,12 @@
         <div class="mobile-container">
             <header class="header">
                 <div class="header-left">
-                    <span class="icon" id="back-to-input">←</span>
+                    <span class="icon" id="back-to-input">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#5f6368" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="19" y1="12" x2="5" y2="12"></line>
+                            <polyline points="12 19 5 12 12 5"></polyline>
+                        </svg>
+                    </span>
                     <h2 id="list-page-title">쇼핑</h2>
                 </div>
                 <div class="header-icons">
@@ -462,7 +467,7 @@
                 const minifiedJson = JSON.stringify(jsonObj);
                 
                 const encoded = urlSafeB64Encode(minifiedJson);
-                const shareUrl = window.location.origin + window.location.pathname + '?input=' + encoded;
+                const shareUrl = window.location.origin + window.location.pathname + '?input=' + encoded + '&readonly=1';
                 
                 navigator.clipboard.writeText(shareUrl).then(() => {
                     linkStatus.textContent = '링크가 클립보드에 복사되었습니다!';
@@ -476,8 +481,17 @@
             }
         });
 
-        // '뒤로가기' 버튼 숨김
-        backToInputBtn.style.display = 'none';
+        // '뒤로가기' 버튼 클릭 시 (특히 readonly 모드에서) 입력창 표시
+        backToInputBtn.addEventListener('click', () => {
+            if (inputPage.style.display === 'none' || getComputedStyle(inputPage).display === 'none') {
+                inputPage.style.display = 'flex';
+                document.body.style.justifyContent = 'center'; // 양쪽 페이지가 보이도록
+                
+                // 모든 쿼리 파라미터 제거하여 깔끔한 상태로 전환
+                const url = new URL(window.location.origin + window.location.pathname);
+                window.history.pushState({}, '', url);
+            }
+        });
 
         // 업데이트 함수
         function updatePreview() {
